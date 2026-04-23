@@ -1,0 +1,169 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  email        String   @unique
+  password     String
+  isPremium    Boolean  @default(false)
+  isAdmin      Boolean  @default(false)
+  isBanned     Boolean  @default(false)
+  gender       String?
+  age          Int?
+  bio          String?
+  credits      Int      @default(0)
+  isOnline     Boolean  @default(false)
+  lastSeen     DateTime @default(now())
+  createdAt    DateTime @default(now())
+  lastLogin    DateTime @default(now())
+
+  photos              Photo[]
+  followers           Follow[] @relation("UserFollowers")
+  following           Follow[] @relation("UserFollowing")
+  sessionsAsUser      Session[] @relation("SessionUser")
+  sessionsAsPartner   Session[] @relation("SessionPartner")
+  reportsMade         Report[] @relation("ReportReporter")
+  reportsReceived     Report[] @relation("ReportReported")
+  messagesSent        Message[] @relation("MessageSender")
+  messagesReceived    Message[] @relation("MessageReceiver")
+  posts               Post[]
+  giftsSent           Gift[] @relation("GiftSender")
+  giftsReceived       Gift[] @relation("GiftReceiver")
+  creditTransactions  CreditTransaction[]
+  postLikes           PostLike[]
+  postComments        PostComment[]
+}
+
+model Photo {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  url       String
+  isProfile Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Follow {
+  id          Int      @id @default(autoincrement())
+  followerId  Int
+  followingId Int
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("UserFollowers", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("UserFollowing", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+}
+
+model Session {
+  id         Int       @id @default(autoincrement())
+  userId     Int
+  partnerId  Int?
+  startTime  DateTime  @default(now())
+  endTime    DateTime?
+  isReported Boolean   @default(false)
+
+  user    User @relation("SessionUser", fields: [userId], references: [id], onDelete: Cascade)
+  partner User? @relation("SessionPartner", fields: [partnerId], references: [id], onDelete: SetNull)
+}
+
+model Report {
+  id          Int      @id @default(autoincrement())
+  reporterId  Int
+  reportedId  Int
+  reason      String
+  description String?
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+
+  reporter User @relation("ReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reported User @relation("ReportReported", fields: [reportedId], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id         Int      @id @default(autoincrement())
+  senderId   Int
+  receiverId Int
+  content    String
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  sender   User @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  content   String?
+  createdAt DateTime @default(now())
+
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  photos   PostPhoto[]
+  likes    PostLike[]
+  comments PostComment[]
+}
+
+model PostPhoto {
+  id     Int    @id @default(autoincrement())
+  postId Int
+  url    String
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model PostLike {
+  id        Int      @id @default(autoincrement())
+  postId    Int
+  userId    Int
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+}
+
+model PostComment {
+  id        Int      @id @default(autoincrement())
+  postId    Int
+  userId    Int
+  content   String
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Gift {
+  id         Int      @id @default(autoincrement())
+  senderId   Int
+  receiverId Int
+  giftType   String
+  giftName   String
+  cost       Int
+  message    String?
+  createdAt  DateTime @default(now())
+
+  sender   User @relation("GiftSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("GiftReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+}
+
+model CreditTransaction {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  amount      Int
+  type        String
+  description String?
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

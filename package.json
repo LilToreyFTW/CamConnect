@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "server": "node server.js",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "prisma generate"
   },
   "keywords": [
     "video",
@@ -20,13 +21,14 @@
   "author": "",
   "license": "UNLICENSED",
   "dependencies": {
+    "@prisma/client": "^5.22.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^7.0.3",
     "next": "^16.2.4",
+    "prisma": "^5.22.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "socket.io": "^4.6.1",
