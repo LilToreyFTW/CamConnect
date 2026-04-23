@@ -1055,7 +1055,36 @@ io.on('connection', (socket) => {
     });
 });
 
+// Seed owner account on startup
+async function seedOwner() {
+    try {
+        const existing = await User.findOne({ email: 'gtagod2020torey@gmail.com' });
+        if (existing) {
+            console.log('Owner account already exists');
+            return;
+        }
+        const hashedPassword = await bcrypt.hash('Torey991200@##@@##$$Owner', 10);
+        const owner = new User({
+            username: 'KingTorFTW',
+            email: 'gtagod2020torey@gmail.com',
+            password: hashedPassword,
+            isAdmin: true,
+            credits: 99999999999,
+            gender: 'male',
+            isOnline: false,
+            lastSeen: Date.now(),
+            createdAt: Date.now(),
+            lastLogin: Date.now()
+        });
+        await owner.save();
+        console.log('Owner account created: KingTorFTW');
+    } catch (err) {
+        console.error('Failed to seed owner account:', err.message);
+    }
+}
+
 const PORT = process.env.PORT || 3001;
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
+    await seedOwner();
     console.log(`Server running on port ${PORT}`);
 });
