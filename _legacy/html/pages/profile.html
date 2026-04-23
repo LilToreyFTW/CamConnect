@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - CamConnect | Live Video Chat Platform</title>
+    <meta name="description" content="View and edit your CamConnect profile. Add photos, update your bio, and manage your account settings.">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="../index.html" class="logo">
+                    <img src="../pages/logos/top-left-logo-for-website/CamConnect.png" alt="CamConnect" width="150">
+                </a>
+                <ul class="nav-menu">
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="feed.html">Feed</a></li>
+                    <li><a href="messages.html">Messages</a></li>
+                    <li><a href="profile.html">Profile</a></li>
+                </ul>
+                <div class="nav-buttons">
+                    <button class="btn btn-outline" id="logout-btn">Logout</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="profile-header">
+            <div class="container">
+                <div class="profile-cover">
+                    <div class="profile-info">
+                        <div class="profile-avatar">
+                            <img id="profile-photo" src="" alt="Profile Photo">
+                            <button class="btn btn-small" id="upload-photo">Upload Photo</button>
+                        </div>
+                        <div class="profile-details">
+                            <h1 id="username">Loading...</h1>
+                            <p id="user-bio">No bio yet</p>
+                            <div class="profile-stats">
+                                <span><strong id="followers-count">0</strong> Followers</span>
+                                <span><strong id="following-count">0</strong> Following</span>
+                                <span><strong id="credits-count">0</strong> Credits</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="profile-content">
+            <div class="container">
+                <div class="profile-grid">
+                    <div class="profile-main">
+                        <div class="profile-section">
+                            <h2>Edit Profile</h2>
+                            <form id="profile-form">
+                                <div class="form-group">
+                                    <label for="bio">Bio</label>
+                                    <textarea id="bio" name="bio" maxlength="500" placeholder="Tell us about yourself..."></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="age">Age</label>
+                                    <input type="number" id="age" name="age" min="18" placeholder="Your age">
+                                </div>
+                                <div class="form-group">
+                                    <label for="gender">Gender</label>
+                                    <select id="gender" name="gender">
+                                        <option value="">Select gender</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="couple">Couple</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="location">Location</label>
+                                    <input type="text" id="location" name="location" placeholder="City, Country">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+
+                        <div class="profile-section">
+                            <h2>My Photos</h2>
+                            <div class="photos-grid" id="photos-grid">
+                                <!-- Photos will be loaded here -->
+                            </div>
+                            <button class="btn btn-outline" id="add-photo-btn">Add Photo</button>
+                        </div>
+                    </div>
+
+                    <div class="profile-sidebar">
+                        <div class="profile-section">
+                            <h2>Quick Actions</h2>
+                            <div class="action-buttons">
+                                <button class="btn btn-primary" id="buy-credits">Buy Credits</button>
+                                <button class="btn btn-outline" id="nearby-users">Find Nearby Users</button>
+                            </div>
+                        </div>
+
+                        <div class="profile-section">
+                            <h2>Online Status</h2>
+                            <div class="status-indicator">
+                                <span class="status-dot" id="status-dot"></span>
+                                <span id="status-text">Online</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>CamConnect</h3>
+                    <p>The modern way to meet new people through live video chat.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="terms.html">Terms</a></li>
+                        <li><a href="privacy.html">Privacy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="faq.html">Help Center</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CamConnect. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/profile.js"></script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/socket.io/(.*)",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/html/(.*)",
+      "dest": "/html/$1"
+    },
+    {
+      "src": "/js/(.*)",
+      "dest": "/js/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/feed",
+      "destination": "/html/pages/feed.html"
+    },
+    {
+      "source": "/messages",
+      "destination": "/html/pages/messages.html"
+    },
+    {
+      "source": "/profile",
+      "destination": "/html/pages/profile.html"
+    },
+    {
+      "source": "/faq",
+      "destination": "/html/pages/faq.html"
+    },
+    {
+      "source": "/terms",
+      "destination": "/html/pages/terms.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/html/pages/privacy.html"
+    },
+    {
+      "source": "/contact",
+      "destination": "/html/pages/contact.html"
+    }
+  ],
+  "env": {
+    "MONGODB_URI": "@mongodb-uri",
+    "JWT_SECRET": "@jwt-secret",
+    "STRIPE_SECRET_KEY": "@stripe-secret-key",
+    "STRIPE_WEBHOOK_SECRET": "@stripe-webhook-secret",
+    "CLIENT_URL": "@client-url"
+  }
+}

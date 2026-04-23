@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feed - CamConnect | Live Video Chat Platform</title>
+    <meta name="description" content="View the social feed on CamConnect. See posts from people nearby and around the world.">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="../index.html" class="logo">
+                    <img src="../pages/logos/top-left-logo-for-website/CamConnect.png" alt="CamConnect" width="150">
+                </a>
+                <ul class="nav-menu">
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="feed.html">Feed</a></li>
+                    <li><a href="messages.html">Messages</a></li>
+                    <li><a href="profile.html">Profile</a></li>
+                </ul>
+                <div class="nav-buttons">
+                    <button class="btn btn-outline" id="logout-btn">Logout</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="feed-header">
+            <div class="container">
+                <h1>Social Feed</h1>
+                <p>See what's happening in the CamConnect community</p>
+            </div>
+        </section>
+
+        <section class="feed-content">
+            <div class="container">
+                <div class="feed-grid">
+                    <div class="feed-main">
+                        <div class="create-post">
+                            <h2>Create Post</h2>
+                            <form id="post-form">
+                                <div class="form-group">
+                                    <textarea id="post-content" name="content" maxlength="500" placeholder="What's on your mind?"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="post-photos" name="photos" placeholder="Photo URLs (comma-separated)">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Post</button>
+                            </form>
+                        </div>
+
+                        <div class="feed-posts" id="feed-posts">
+                            <!-- Posts will be loaded here -->
+                        </div>
+                        
+                        <button class="btn btn-outline" id="load-more">Load More</button>
+                    </div>
+
+                    <div class="feed-sidebar">
+                        <div class="sidebar-section">
+                            <h2>Nearby Users</h2>
+                            <div class="nearby-list" id="nearby-list">
+                                <!-- Nearby users will be loaded here -->
+                            </div>
+                            <button class="btn btn-outline btn-small" id="refresh-nearby">Refresh</button>
+                        </div>
+
+                        <div class="sidebar-section">
+                            <h2>Trending</h2>
+                            <div class="trending-list">
+                                <a href="#" class="trending-item">#CamConnect</a>
+                                <a href="#" class="trending-item">#VideoChat</a>
+                                <a href="#" class="trending-item">#MeetNewPeople</a>
+                                <a href="#" class="trending-item">#LiveStream</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>CamConnect</h3>
+                    <p>The modern way to meet new people through live video chat.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="terms.html">Terms</a></li>
+                        <li><a href="privacy.html">Privacy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="faq.html">Help Center</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CamConnect. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/feed.js"></script>
+</body>
+</html>
