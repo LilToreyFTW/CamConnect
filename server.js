@@ -56,7 +56,8 @@ const userSchema = new mongoose.Schema({
     isOnline: { type: Boolean, default: false },
     lastSeen: { type: Date, default: Date.now },
     createdAt: { type: Date, default: Date.now },
-    lastLogin: { type: Date, default: Date.now }
+    lastLogin: { type: Date, default: Date.now },
+    isAdmin: { type: Boolean, default: false }
 });
 
 userSchema.index({ location: '2dsphere' });
@@ -172,7 +173,7 @@ const adminMiddleware = async (req, res, next) => {
 // Register
 app.post('/api/auth/register', async (req, res) => {
     try {
-        const { username, email, password, gender } = req.body;
+        const { username, email, password, gender, adminPassword } = req.body;
         
         // Check if user exists
         const existingUser = await User.findOne({ $or: [{ email }, { username }] });
@@ -183,18 +184,22 @@ app.post('/api/auth/register', async (req, res) => {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
         
+        // Admin creation check
+        const isAdmin = adminPassword && adminPassword === process.env.ADMIN_PASSWORD;
+        
         // Create user
         const user = new User({
             username,
             email,
             password: hashedPassword,
-            gender
+            gender,
+            isAdmin
         });
         
         await user.save();
         
         // Generate token
-        const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
+        const token = jwt.sign({ userId: user._id, isAdmin: user.isAdmin }, JWT_SECRET, { expiresIn: '7d' });
         
         res.status(201).json({
             token,
@@ -203,7 +208,8 @@ app.post('/api/auth/register', async (req, res) => {
                 username: user.username,
                 email: user.email,
                 isPremium: user.isPremium,
-                gender: user.gender
+                gender: user.gender,
+                isAdmin: user.isAdmin
             }
         });
     } catch (error) {
@@ -230,7 +236,7 @@ app.post('/api/auth/login', async (req, res) => {
         user.lastLogin = Date.now();
         await user.save();
         
-        const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
+        const token = jwt.sign({ userId: user._id, isAdmin: user.isAdmin }, JWT_SECRET, { expiresIn: '7d' });
         
         res.json({
             token,
@@ -239,7 +245,8 @@ app.post('/api/auth/login', async (req, res) => {
                 username: user.username,
                 email: user.email,
                 isPremium: user.isPremium,
-                gender: user.gender
+                gender: user.gender,
+                isAdmin: user.isAdmin
             }
         });
     } catch (error) {
@@ -254,6 +261,7 @@ app.get('/api/auth/me', authMiddleware, async (req, res) => {
         username: req.user.username,
         email: req.user.email,
         isPremium: req.user.isPremium,
+        isAdmin: req.user.isAdmin,
         gender: req.user.gender,
         age: req.user.age,
         bio: req.user.bio,
