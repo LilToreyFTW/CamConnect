@@ -7,6 +7,9 @@ const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
+// Fix BigInt serialization for JSON responses
+BigInt.prototype.toJSON = function() { return Number(this); };
+
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -983,6 +986,19 @@ io.on('connection', (socket) => {
 
 // Seed owner account on startup
 async function seedOwner() {
+    try {
+        const existing = await prisma.user.findUnique({
+            where: { email: 'gtagod2020torey@gmail.com' }
+        });
+        if (existing) {
+            console.log('Owner account already exists');
+            return;
+        }
+    } catch (err) {
+        console.log('Retrying owner check after schema change...');
+        await new Promise(r => setTimeout(r, 1000));
+    }
+    
     try {
         const existing = await prisma.user.findUnique({
             where: { email: 'gtagod2020torey@gmail.com' }

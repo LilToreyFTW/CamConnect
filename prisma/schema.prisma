@@ -18,7 +18,7 @@ model User {
   gender       String?
   age          Int?
   bio          String?
-  credits      Int      @default(0)
+  credits      BigInt   @default(0)
   isOnline     Boolean  @default(false)
   lastSeen     DateTime @default(now())
   createdAt    DateTime @default(now())
@@ -149,7 +149,7 @@ model Gift {
   receiverId Int
   giftType   String
   giftName   String
-  cost       Int
+  cost       BigInt
   message    String?
   createdAt  DateTime @default(now())
 
@@ -160,7 +160,7 @@ model Gift {
 model CreditTransaction {
   id          Int      @id @default(autoincrement())
   userId      Int
-  amount      Int
+  amount      BigInt
   type        String
   description String?
   createdAt   DateTime @default(now())

@@ -1,0 +1,8 @@
+-- AlterTable
+ALTER TABLE "CreditTransaction" ALTER COLUMN "amount" SET DATA TYPE BIGINT;
+
+-- AlterTable
+ALTER TABLE "Gift" ALTER COLUMN "cost" SET DATA TYPE BIGINT;
+
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "credits" SET DATA TYPE BIGINT;
