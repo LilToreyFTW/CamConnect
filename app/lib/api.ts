@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
 
 function getToken() {
   if (typeof window !== 'undefined') {
@@ -8,7 +8,7 @@ function getToken() {
 }
 
 export async function apiFetch(path: string, options: RequestInit = {}) {
-  const url = `${API_URL}${path}`;
+  const url = API_URL ? `${API_URL}${path}` : path;
   const token = getToken();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -73,18 +73,18 @@ export async function createPost(content: string, photos: string[] = []) {
   });
 }
 
-export async function likePost(postId: string) {
+export async function likePost(postId: number | string) {
   return apiFetch(`/api/posts/${postId}/like`, { method: 'POST' });
 }
 
-export async function commentPost(postId: string, content: string) {
+export async function commentPost(postId: number | string, content: string) {
   return apiFetch(`/api/posts/${postId}/comments`, {
     method: 'POST',
     body: JSON.stringify({ content }),
   });
 }
 
-export async function getProfile(userId?: string) {
+export async function getProfile(userId?: number | string) {
   if (userId) return apiFetch(`/api/profile/${userId}`);
   return apiFetch('/api/auth/me');
 }
@@ -103,11 +103,11 @@ export async function uploadPhoto(url: string, isProfile = false) {
   });
 }
 
-export async function deletePhoto(photoId: string) {
+export async function deletePhoto(photoId: number | string) {
   return apiFetch(`/api/profile/photos/${photoId}`, { method: 'DELETE' });
 }
 
-export async function getUserProfile(userId: string) {
+export async function getUserProfile(userId: number | string) {
   return apiFetch(`/api/profile/${userId}`);
 }
 
@@ -115,11 +115,11 @@ export async function getConversations() {
   return apiFetch('/api/conversations');
 }
 
-export async function getMessages(userId: string) {
+export async function getMessages(userId: number | string) {
   return apiFetch(`/api/messages/${userId}`);
 }
 
-export async function markMessagesRead(userId: string) {
+export async function markMessagesRead(userId: number | string) {
   return apiFetch(`/api/messages/${userId}/read`, { method: 'PATCH' });
 }
 

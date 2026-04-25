@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import RouteGuard from '@/app/components/RouteGuard';
 import CreditsModal from '@/app/components/CreditsModal';
-import { getProfile, updateProfile, uploadPhoto, deletePhoto, createCheckoutSession } from '@/app/lib/api';
+import { createCheckoutSession, deletePhoto, getProfile, updateProfile, uploadPhoto } from '@/app/lib/api';
 
 export default function ProfilePage() {
   return (
@@ -15,14 +15,14 @@ export default function ProfilePage() {
 }
 
 function ProfileContent() {
-  const { user, refreshUser } = useAuth();
+  const { refreshUser } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [photoUrl, setPhotoUrl] = useState('');
   const [showCredits, setShowCredits] = useState(false);
-  const [form, setForm] = useState({ bio: '', age: '', gender: '', location: '' });
+  const [form, setForm] = useState({ bio: '', age: '', gender: '' });
 
   useEffect(() => {
     loadProfile();
@@ -36,7 +36,6 @@ function ProfileContent() {
         bio: data.bio || '',
         age: data.age ? String(data.age) : '',
         gender: data.gender || '',
-        location: data.location?.city || '',
       });
     } catch (err) {
       console.error('Failed to load profile', err);
@@ -47,12 +46,12 @@ function ProfileContent() {
 
   const handleSave = async () => {
     setSaving(true);
+
     try {
-      const updates: any = {};
+      const updates: Record<string, any> = {};
       if (form.bio) updates.bio = form.bio;
-      if (form.age) updates.age = parseInt(form.age);
+      if (form.age) updates.age = parseInt(form.age, 10);
       if (form.gender) updates.gender = form.gender;
-      if (form.location) updates.location = { city: form.location };
 
       await updateProfile(updates);
       await refreshUser();
@@ -67,6 +66,7 @@ function ProfileContent() {
 
   const handleAddPhoto = async () => {
     if (!photoUrl.trim()) return;
+
     try {
       await uploadPhoto(photoUrl, profile.photos?.length === 0);
       setPhotoUrl('');
@@ -77,8 +77,9 @@ function ProfileContent() {
     }
   };
 
-  const handleDeletePhoto = async (photoId: string) => {
+  const handleDeletePhoto = async (photoId: number) => {
     if (!confirm('Delete this photo?')) return;
+
     try {
       await deletePhoto(photoId);
       await loadProfile();
@@ -89,6 +90,8 @@ function ProfileContent() {
   };
 
   const handleBuyPremium = async () => {
+    if (profile?.isPremium) return;
+
     try {
       const { url } = await createCheckoutSession();
       if (url) window.location.href = url;
@@ -110,29 +113,31 @@ function ProfileContent() {
       <div style={{ background: 'var(--surface)', borderRadius: 16, padding: '2rem', border: '1px solid var(--border)', marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
           <img
-            src={profile?.photos?.find((p: any) => p.isProfile)?.url || profile?.photos?.[0]?.url || '/logos/top-left-logo-for-website/CamConnect.png'}
+            src={profile?.photos?.find((photo: any) => photo.isProfile)?.url || profile?.photos?.[0]?.url || '/logos/top-left-logo-for-website/CamConnect.png'}
             alt=""
             style={{ width: 100, height: 100, borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--primary-color)' }}
           />
+
           <div style={{ flex: 1 }}>
             <h1 style={{ marginBottom: '0.25rem' }}>{profile?.username || 'User'}</h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
               {profile?.bio || 'No bio yet'}
             </p>
-            <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+            <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)', flexWrap: 'wrap' }}>
               <span><strong style={{ color: 'var(--text-primary)' }}>{profile?.followers || 0}</strong> followers</span>
               <span><strong style={{ color: 'var(--text-primary)' }}>{profile?.following || 0}</strong> following</span>
               <span><strong style={{ color: 'var(--text-primary)' }}>{profile?.credits || 0}</strong> credits</span>
               {profile?.isPremium && (
-                <span style={{ color: '#fbbf24' }}>★ Premium</span>
+                <span style={{ color: '#fbbf24' }}>Premium</span>
               )}
             </div>
           </div>
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <button className="btn btn-primary btn-small" onClick={() => setEditing(!editing)}>
+            <button className="btn btn-primary btn-small" onClick={() => setEditing((open) => !open)}>
               {editing ? 'Cancel' : 'Edit Profile'}
             </button>
-            <button className="btn btn-outline btn-small" onClick={handleBuyPremium}>
+            <button className="btn btn-outline btn-small" onClick={handleBuyPremium} disabled={profile?.isPremium}>
               {profile?.isPremium ? 'Premium Active' : 'Buy Premium'}
             </button>
             <button className="btn btn-outline btn-small" onClick={() => setShowCredits(true)}>
@@ -154,6 +159,7 @@ function ProfileContent() {
                 maxLength={500}
               />
             </div>
+
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
               <div className="form-group">
                 <label>Age</label>
@@ -164,6 +170,7 @@ function ProfileContent() {
                   min={18}
                 />
               </div>
+
               <div className="form-group">
                 <label>Gender</label>
                 <select value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value })}>
@@ -174,15 +181,8 @@ function ProfileContent() {
                   <option value="other">Other</option>
                 </select>
               </div>
-              <div className="form-group">
-                <label>City</label>
-                <input
-                  type="text"
-                  value={form.location}
-                  onChange={(e) => setForm({ ...form, location: e.target.value })}
-                />
-              </div>
             </div>
+
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
               <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
                 {saving ? 'Saving...' : 'Save Changes'}
@@ -204,13 +204,14 @@ function ProfileContent() {
           />
           <button className="btn btn-small btn-primary" onClick={handleAddPhoto}>Add Photo</button>
         </div>
+
         {profile?.photos?.length > 0 ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '0.75rem' }}>
             {profile.photos.map((photo: any) => (
-              <div key={photo._id} style={{ position: 'relative', aspectRatio: '1', borderRadius: 8, overflow: 'hidden' }}>
+              <div key={photo.id} style={{ position: 'relative', aspectRatio: '1', borderRadius: 8, overflow: 'hidden' }}>
                 <img src={photo.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 <button
-                  onClick={() => handleDeletePhoto(photo._id)}
+                  onClick={() => handleDeletePhoto(photo.id)}
                   style={{
                     position: 'absolute',
                     top: 4,
@@ -225,7 +226,7 @@ function ProfileContent() {
                     fontSize: 12,
                   }}
                 >
-                  ×
+                  x
                 </button>
                 {photo.isProfile && (
                   <div style={{ position: 'absolute', bottom: 4, left: 4, background: 'var(--primary-color)', color: '#fff', fontSize: 10, padding: '2px 6px', borderRadius: 4 }}>

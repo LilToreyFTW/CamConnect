@@ -4,10 +4,10 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { getMe, login as apiLogin, register as apiRegister } from '@/app/lib/api';
 
 interface User {
-  _id: string;
+  id: number;
   username: string;
   email: string;
-  photos?: string[];
+  photos?: Array<{ id: number; url: string; isProfile?: boolean }>;
   isPremium?: boolean;
   isAdmin?: boolean;
   credits?: number;
@@ -15,7 +15,6 @@ interface User {
   bio?: string;
   age?: number;
   gender?: string;
-  location?: string;
 }
 
 interface AuthContextType {

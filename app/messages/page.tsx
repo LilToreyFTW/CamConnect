@@ -16,16 +16,16 @@ export default function MessagesPage() {
 
 function MessagesContent() {
   const { user } = useAuth();
-  const { socket } = useSocket(user?._id);
+  const { socket } = useSocket(user?.id);
   const [conversations, setConversations] = useState<any[]>([]);
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [typing, setTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const typingTimeout = useRef<NodeJS.Timeout | null>(null);
+  const typingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     loadConversations();
@@ -41,7 +41,7 @@ function MessagesContent() {
       loadConversations();
     };
 
-    const handleTyping = (senderId: string) => {
+    const handleTyping = (senderId: number) => {
       if (senderId === selectedUserId) {
         setTyping(true);
         if (typingTimeout.current) clearTimeout(typingTimeout.current);
@@ -49,7 +49,7 @@ function MessagesContent() {
       }
     };
 
-    const handleStoppedTyping = (senderId: string) => {
+    const handleStoppedTyping = (senderId: number) => {
       if (senderId === selectedUserId) {
         setTyping(false);
       }
@@ -84,6 +84,7 @@ function MessagesContent() {
   const selectConversation = async (conv: any) => {
     setSelectedUserId(conv.userId);
     setSelectedUser(conv);
+
     try {
       const msgs = await getMessages(conv.userId);
       setMessages(msgs || []);
@@ -96,10 +97,11 @@ function MessagesContent() {
 
   const sendMessage = () => {
     if (!newMessage.trim() || !socket || !selectedUserId) return;
+
     socket.emit('send-message', { receiverId: selectedUserId, content: newMessage });
     setMessages((prev) => [
       ...prev,
-      { senderId: user?._id, receiverId: selectedUserId, content: newMessage, createdAt: new Date().toISOString() },
+      { senderId: user?.id, receiverId: selectedUserId, content: newMessage, createdAt: new Date().toISOString() },
     ]);
     setNewMessage('');
     socket.emit('stop-typing', selectedUserId);
@@ -113,7 +115,7 @@ function MessagesContent() {
   };
 
   return (
-    <main style={{ paddingTop: 80, height: '100vh', display: 'flex' }}>
+    <main style={{ paddingTop: 80, minHeight: '100vh', display: 'flex', flexWrap: 'wrap' }}>
       <div
         style={{
           width: 320,
@@ -186,7 +188,7 @@ function MessagesContent() {
         </div>
       </div>
 
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: '#12121a' }}>
+      <div style={{ flex: 1, minWidth: 320, display: 'flex', flexDirection: 'column', background: '#12121a' }}>
         {selectedUserId ? (
           <>
             <div
@@ -212,11 +214,11 @@ function MessagesContent() {
             </div>
 
             <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {messages.map((msg, i) => {
-                const isMe = msg.senderId === user?._id;
+              {messages.map((msg, index) => {
+                const isMe = msg.senderId === user?.id;
                 return (
                   <div
-                    key={i}
+                    key={`${msg.id || 'temp'}-${index}`}
                     style={{
                       alignSelf: isMe ? 'flex-end' : 'flex-start',
                       maxWidth: '60%',
@@ -235,6 +237,7 @@ function MessagesContent() {
                   </div>
                 );
               })}
+
               {typing && (
                 <div
                   style={{
@@ -249,6 +252,7 @@ function MessagesContent() {
                   typing...
                 </div>
               )}
+
               <div ref={messagesEndRef} />
             </div>
 
@@ -274,7 +278,7 @@ function MessagesContent() {
             </div>
           </>
         ) : (
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', padding: '2rem' }}>
             <p>Select a conversation to start chatting</p>
           </div>
         )}

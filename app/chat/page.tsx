@@ -5,7 +5,7 @@ import { useAuth } from '@/app/context/AuthContext';
 import RouteGuard from '@/app/components/RouteGuard';
 import { io, Socket } from 'socket.io-client';
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 const ICE_SERVERS = {
   iceServers: [
     { urls: 'stun:stun.l.google.com:19302' },
@@ -65,7 +65,7 @@ function ChatContent() {
     socketRef.current = socket;
 
     socket.on('connect', () => {
-      socket.emit('join', user?._id);
+      socket.emit('join', user?.id);
     });
 
     socket.on('partner-found', async ({ socketId, userId }: any) => {

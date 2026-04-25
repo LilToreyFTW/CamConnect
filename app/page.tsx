@@ -10,11 +10,13 @@ export default function Home() {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
   const [showAuth, setShowAuth] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
 
   const handleStartChat = () => {
     if (isAuthenticated) {
       router.push('/chat');
     } else {
+      setAuthMode('login');
       setShowAuth(true);
     }
   };
@@ -121,9 +123,9 @@ export default function Home() {
 
       {showAuth && (
         <AuthModal
-          mode="login"
+          mode={authMode}
           onClose={() => setShowAuth(false)}
-          onSwitchMode={() => {}}
+          onSwitchMode={() => setAuthMode((mode) => (mode === 'login' ? 'register' : 'login'))}
         />
       )}
     </main>
